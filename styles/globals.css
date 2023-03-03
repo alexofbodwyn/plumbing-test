@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-pebble;
+  }
+
+  select {
+    -webkit-appearance: none;
+  }
+
+  .spinner-border {
+    vertical-align: -0.125em;
+    border: 0.25em solid;
+    border-right-color: transparent;
+  }
+}
