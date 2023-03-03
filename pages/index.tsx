@@ -49,7 +49,7 @@ function App () {
         : (
         <>
           <SortFilter sort={sort} handleSortChange={handleSortChange} />
-          <Grid columns={2}>
+          <Grid columns={3}>
             {Array.isArray(data) &&
               data.map((item: Item) => <ProductCard key={item.id} item={item} />)}
           </Grid>

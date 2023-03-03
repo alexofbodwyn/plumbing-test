@@ -6,9 +6,9 @@ interface GridProps {
   columns?: number
 }
 
-function Grid ({ children, columns = 4 }: GridProps) {
+function Grid ({ children, columns }: GridProps) {
   const gridClasses = clsx(
-    'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 m-auto w-full',
+    'grid grid-cols-1 sm:grid-cols-2 gap-5 m-auto w-full',
     {
       'md:grid-cols-2': columns === 2,
       'md:grid-cols-3': columns === 3,
