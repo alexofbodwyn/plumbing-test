@@ -1,65 +1,61 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Item } from "../types/interfaces";
-import useGetData from "../hooks/useGetData";
+import fetchData from "../hooks/useGetData";
 import ProductCard from "../components/productCard";
 import Grid from "../components/grid";
 import SortFilter from "../components/sortFilter";
 import Pagination from "../components/pagination";
-import Loader from "../components/loader";
 
 function App() {
-  const [sort, setSort] = useState<number>(1);
-  const [page, setPage] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const { data, totalPages } = useGetData(sort, page);
-
-  React.useEffect(() => {
-    setLoading(!data);
-  }, [data]);
-
   const router = useRouter();
 
+  const queryPage = router.query.page ?? 1
+  const querySort = router.query.sort ?? 1
+  let queryTotalPages = router.query.totalPages ?? 1
+
+  const [products, setProducts] = useState<Item[]>([])
+  const [totalPages, setTotalPages] = useState<number>(0)
+
+  useEffect(() => {
+    const fetchProductData = async () => {
+      const { data, totalPages } = await fetchData(querySort, queryPage);
+      setProducts(data);
+      setTotalPages(totalPages);
+    };
+
+    fetchProductData();
+  }, [queryPage, querySort]);
+
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSort(parseInt(event.target.value));
-    setPage(1);
-    void router.push(`/?sort=${event.target.value}&page=0`);
+    void router.push(`/?sort=${event.target.value}&page=1`);
   };
 
   const handlePrevPage = () => {
-    const prevPage = Math.max(page - 1, 0);
-    setPage(prevPage);
-    void router.push(`/?sort=${sort}&page=${prevPage}`);
+    const prevPage = Math.max(parseInt(queryPage) - 1, 0);
+    void router.push(`/?sort=${querySort}&page=${prevPage}`);
   };
 
   const handleNextPage = () => {
-    const nextPage = Math.min(page + 1, totalPages - 1);
-    setPage(nextPage);
-    void router.push(`/?sort=${sort}&page=${nextPage}`);
+    const nextPage = Math.min(parseInt(queryPage) + 1, parseInt(queryTotalPages) - 1);
+    void router.push(`/?sort=${querySort}&page=${nextPage}`);
   };
 
   return (
     <div className="max-w-5xl mx-auto p-4">
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <SortFilter sort={sort} handleSortChange={handleSortChange} />
-          <Grid columns={3}>
-            {Array.isArray(data) &&
-              data.map((item: Item) => (
-                <ProductCard key={item.id} item={item} />
-              ))}
-          </Grid>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            handlePrevPage={handlePrevPage}
-            handleNextPage={handleNextPage}
-          />
-        </>
-      )}
+      <SortFilter sort={querySort} handleSortChange={handleSortChange} />
+      <Grid columns={3}>
+        {Array.isArray(products) &&
+          products.map((item: Item) => (
+            <ProductCard key={item.id} item={item} />
+          ))}
+      </Grid>
+      <Pagination
+        page={queryPage}
+        totalPages={queryTotalPages}
+        handlePrevPage={handlePrevPage}
+        handleNextPage={handleNextPage}
+      />
     </div>
   );
 }

@@ -1,12 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Item, ApiResponse } from '../types/interfaces'
+import { Item, ApiResponse } from '../types/interfaces';
 
-const useGetData = (sort: number, page: number) => {
-  const [data, setData] = useState<Item[]>([])
-  const [totalPages, setTotalPages] = useState<number>(1)
-
-  useEffect(() => {
-    fetch('https://spanishinquisition.victorianplumbing.co.uk/interviews/listings?apikey=yj2bV48J40KsBpIMLvrZZ1j1KwxN4u3A83H8IBvI', {
+const fetchData = async (sort: number, page: number) => {
+  try {
+    const response = await fetch('https://spanishinquisition.victorianplumbing.co.uk/interviews/listings?apikey=yj2bV48J40KsBpIMLvrZZ1j1KwxN4u3A83H8IBvI', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -18,16 +14,15 @@ const useGetData = (sort: number, page: number) => {
         additionalPages: 0,
         sort
       })
-    })
-      .then(async response => await response.json())
-      .then((data: ApiResponse) => {
-        setData(data.products)
-        setTotalPages(Math.ceil(data.pagination.total / data.pagination.size))
-      })
-      .catch(error => console.error(error))
-  }, [sort, page])
+    });
+    const responseData: ApiResponse = await response.json();
+    const data = responseData.products;
+    const totalPages = Math.ceil(responseData.pagination.total / responseData.pagination.size);
+    return { data, totalPages };
+  } catch (error) {
+    console.error(error);
+    return { data: [], totalPages: 0 };
+  }
+};
 
-  return { data, totalPages }
-}
-
-export default useGetData
+export default fetchData;
