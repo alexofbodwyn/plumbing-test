@@ -12,7 +12,6 @@ function App() {
 
   const queryPage = router.query.page ?? 1
   const querySort = router.query.sort ?? 1
-  let queryTotalPages = router.query.totalPages ?? 1
 
   const [products, setProducts] = useState<Item[]>([])
   const [totalPages, setTotalPages] = useState<number>(0)
@@ -52,7 +51,7 @@ function App() {
       </Grid>
       <Pagination
         page={queryPage}
-        totalPages={queryTotalPages}
+        totalPages={totalPages}
         handlePrevPage={handlePrevPage}
         handleNextPage={handleNextPage}
       />
